@@ -15,7 +15,7 @@ BLUE = (50, 50, 255)
 
 class PacmanMain:
     "This class handles the main initialization and creation of the game"
-    def __init__(self, width=800, height=600):
+    def __init__(self, width=800, height=530):
         "initialize pygame"        
         pygame.init()
         "set window size"
@@ -29,12 +29,17 @@ class PacmanMain:
 
         # List to hold all the sprites
         self.all_sprite_list = pygame.sprite.Group()
- 
+        
+
+        # List to hold the dots 
+        self.all_dots_list = pygame.sprite.Group()
+        
 # Make the walls. (x_pos, y_pos, width, height)
         self.wall_list = pygame.sprite.Group()
         
         self.loadLayout("./Game-Layout/layout")
- 
+
+        self.pacman.dots_to_eat = self.all_dots_list
         # Create the player paddle object
         #self.pacman = PacmanAgent(20, 20)
         self.pacman.walls = self.wall_list
@@ -50,15 +55,16 @@ class PacmanMain:
         for line in f:
             lineX = 0  #actual position in X of the sprite.        
             line = line.strip()
-            print(line)
+            #print(line)
             for c in line:
                 if(c == "@"):
-                    wall = Wall(lineX,lineY*40, 40, 40)
+                    wall = Wall(lineX,lineY*40, 35, 35)
                     self.wall_list.add(wall)
                     self.all_sprite_list.add(wall)
                 elif(c == "."):
                     dot = Dot(lineX+10,lineY*40+15, 10, 10)
                     self.all_sprite_list.add(dot)
+                    self.all_dots_list.add(dot)
                 elif(c == "P"):
                     self.pacman = PacmanAgent(lineX+20, lineY*40)
                     self.pacman.walls = self.wall_list
@@ -69,9 +75,11 @@ class PacmanMain:
                     pass
                 lineX += 40
             lineY+=1
+
     def mainLoop(self):
         "Main loop of the game"
         while 1:
+            self.pacman.tryToEatDot()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()

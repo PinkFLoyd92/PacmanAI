@@ -27,12 +27,20 @@ class PacmanAgent(pygame.sprite.Sprite):
         self.change_x = 0
         self.change_y = 0
         self.walls = None
+        self.dots_to_eat = None
  
     def changespeed(self, x, y):
         """ Change the speed of the player. """
         self.change_x += x
         self.change_y += y
- 
+
+    def tryToEatDot(self):
+        """Eat a dot, update the dots quantity"""
+        block_hit_list = pygame.sprite.spritecollide(self, self.dots_to_eat, False)
+        for dot in block_hit_list:
+            self.dots_to_eat.remove(dot)
+            dot.kill()
+            
     def update(self):
         """ Update the player position. """
         # Move left/right
