@@ -14,5 +14,3 @@ class Block(pygame.sprite.Sprite):
         and its x and y position. """
         # Call the parent class (Sprite) constructor
         super().__init__()
-        
-        
