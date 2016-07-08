@@ -2,6 +2,7 @@ import os, sys
 import pygame
 from pygame.locals import *
 from Sprites.wall import Wall
+from Sprites.ghost import GhostAgent
 from Sprites.pacmanAgent import PacmanAgent
 from Sprites.food import Dot
 if not pygame.font: print ('Warning, fonts disabled')
@@ -29,7 +30,9 @@ class PacmanMain:
 
         # List to hold all the sprites
         self.all_sprite_list = pygame.sprite.Group()
-        
+
+        #list of the ghosts
+        self.ghosts_list = pygame.sprite.Group()
 
         # List to hold the dots 
         self.all_dots_list = pygame.sprite.Group()
@@ -47,10 +50,12 @@ class PacmanMain:
         self.all_sprite_list.add(self.pacman)
  
         self.clock = pygame.time.Clock()
+        
     def loadLayout(self, filepath):
         """We load the layout from the file"""
         lineY = 0  #number of the iteration
         lineX = 0  #actual position in X of the sprite.
+        counterGhosts = 0 #counter of the number of ghosts in the game
         f = open(filepath, 'r')
         for line in f:
             lineX = 0  #actual position in X of the sprite.        
@@ -70,7 +75,28 @@ class PacmanMain:
                     self.pacman.walls = self.wall_list
                     self.all_sprite_list.add(self.pacman)
                 elif(c == "G"):
-                    pass
+                    print(counterGhosts)
+                    if(counterGhosts == 0):
+                        ghost = GhostAgent(lineX+10,lineY*40,"blinky")
+                        ghost.walls = self.wall_list
+                        self.ghosts_list.add(ghost)
+                        self.all_sprite_list.add(ghost)
+                    elif(counterGhosts == 1):
+                        ghost = GhostAgent(lineX+10,lineY*40,"clyde")
+                        self.ghosts_list.add(ghost)
+                        self.all_sprite_list.add(ghost)
+                        ghost.walls = self.wall_list
+                    elif(counterGhosts == 2):
+                        ghost = GhostAgent(lineX+10,lineY*40,"pinky")
+                        self.ghosts_list.add(ghost)
+                        self.all_sprite_list.add(ghost)
+                        ghost.walls = self.wall_list
+                    elif(counterGhosts == 3):
+                        ghost = GhostAgent(lineX+10,lineY*40,"red")
+                        self.all_sprite_list.add(ghost)
+                        ghost.walls = self.wall_list
+                    counterGhosts+=1
+                    
                 elif(c == "o"):
                     pass
                 lineX += 40
