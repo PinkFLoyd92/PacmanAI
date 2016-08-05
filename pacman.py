@@ -69,6 +69,8 @@ class PacmanMain:
                     self.all_sprite_list.add(wall)
                 elif(c == "."):
                     dot = Dot(lineX+10, lineY*40+15, 10, 10)
+                    print(dot.rect.x)
+                    print(dot.rect.y)
                     self.all_sprite_list.add(dot)
                     self.all_dots_list.add(dot)
                 elif(c == "P"):
@@ -111,7 +113,7 @@ class PacmanMain:
                     sys.exit()
                 elif event.type == pygame.KEYDOWN:
                     self.pacman.image = pygame.transform.scale(self. pacman.image, (20, 20))
-                    if event.kecy == pygame.K_LEFT:
+                    if event.key == pygame.K_LEFT:
                         self.pacman.image = pygame.image.load("Images/pacman_left.png").convert_alpha()
                         self.pacman.changespeed(-3, 0)
                     elif event.key == pygame.K_RIGHT:

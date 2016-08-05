@@ -25,3 +25,9 @@ class Artificial_Computation:
 
     def getHeuristicValue(self):
         return self.gameState.getScore()
+
+    def setHeuristicValue(self):
+        pass 
+    
+    def getTest(self):
+        pass
