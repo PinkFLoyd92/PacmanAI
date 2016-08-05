@@ -6,7 +6,7 @@ from Sprites.food import Dot
 from Sprites.ghost import GhostAgent
 from Sprites.pacmanAgent import PacmanAgent
 from Sprites.wall import Wall
-
+from graph import Pacman_Graph
 
 # from pygame.locals import *
 if not pygame.font:
@@ -44,6 +44,7 @@ class PacmanMain:
         self.all_dots_list = pygame.sprite.Group()
         # Make the walls. (x_pos, y_pos, width, height)
         self.wall_list = pygame.sprite.Group()
+        self.graph = Pacman_Graph()
         self.loadLayout("./Game-Layout/layout")
         self.pacman.dots_to_eat = self.all_dots_list
         # Create the player paddle object
@@ -69,14 +70,16 @@ class PacmanMain:
                     self.all_sprite_list.add(wall)
                 elif(c == "."):
                     dot = Dot(lineX+10, lineY*40+15, 10, 10)
-                    print(dot.rect.x)
-                    print(dot.rect.y)
+                    # print(dot.rect.x)
+                    # print(dot.rect.y)
                     self.all_sprite_list.add(dot)
                     self.all_dots_list.add(dot)
+                    self.graph.create_node(dot, False, False)
                 elif(c == "P"):
                     self.pacman = PacmanAgent(lineX+10, lineY*40)
                     self.pacman.walls = self.wall_list
                     self.all_sprite_list.add(self.pacman)
+                    self.graph.create_node(self.pacman, True, False)
                 elif(c == "G"):
                     print(counterGhosts)
                     if(counterGhosts == 0):
@@ -84,25 +87,13 @@ class PacmanMain:
                         ghost.walls = self.wall_list
                         self.ghosts_list.add(ghost)
                         self.all_sprite_list.add(ghost)
-                    elif(counterGhosts == 1):
-                        ghost = GhostAgent(lineX+10, lineY*40, "clyde")
-                        self.ghosts_list.add(ghost)
-                        self.all_sprite_list.add(ghost)
-                        ghost.walls = self.wall_list
-                    elif(counterGhosts == 2):
-                        ghost = GhostAgent(lineX+10, lineY*40, "pinky")
-                        self.ghosts_list.add(ghost)
-                        self.all_sprite_list.add(ghost)
-                        ghost.walls = self.wall_list
-                    elif(counterGhosts == 3):
-                        ghost = GhostAgent(lineX+10, lineY*40, "red")
-                        self.all_sprite_list.add(ghost)
-                        ghost.walls = self.wall_list
+                        self.graph.create_node(ghost, False, True)
                     counterGhosts += 1
                 elif(c == "o"):
                     pass
                 lineX += 40
             lineY += 1
+        self.graph.print_graph()
 
     def mainLoop(self):
         "Main loop of the game"
