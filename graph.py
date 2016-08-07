@@ -1,6 +1,7 @@
 """ All the state of the game will be saved here"""
 import networkx as nx
 
+
 RIGHT = 1
 LEFT = 2
 DOWN = 3

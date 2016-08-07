@@ -6,6 +6,10 @@ class Artificial_Computation:
         "we receive a game state, so we can generate our minimax function according to the actual board state."
         self.gameState = gameState
 
+    def minimax2(self):
+        if(self.gameState.over is True):
+            return()
+
     def minimax(self, node, depth, maximizingPlayer):
         if(depth == 0 or node.isTerminalNode()):
             return self.getHeuristicValue()
