@@ -1,16 +1,34 @@
-# Enter your code here. Read input from STDIN. Print output to STDOUT
+import networkx as nx
+from graph import Pacman_Graph
+
 class Node:
-    def __init__(self, value, point):
-        self.value = value
-        self.point = point
+    def __init__(self, graph_node, node_pacman, node_ghost):
+        """ Initialize the node with the sprite in that node(graph_node), the type of node(type) """
+        self.graph_node = graph_node
+        self.node_ghost = node_ghost
+        self.node_pacman = node_pacman
         self.parent = None
         self.H = 0
         self.G = 0
 
-    def move_cost(self, other):
+    def move_cost(self, other_node):
         """ method that computes the cost of the current node to another one"""
-        return 0
+        pass
 
+class State_Graph:
+    def __init__(self):
+        """ Class that contains the AI part of the program"""
+        self.state_nodes = []
+        
+
+    def fillGraph(self, pacman_graph):
+        pass
+
+
+
+
+
+        
 def children(point, grid):
     x, y = point. point
     links = [grid[d[0]][d[1]] for d in [(x-1, y), (x, y - 1), (x, y + 1), (x+1, y)]]

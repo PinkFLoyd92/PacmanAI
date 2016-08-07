@@ -7,7 +7,7 @@ from Sprites.ghost import GhostAgent
 from Sprites.pacmanAgent import PacmanAgent
 from Sprites.wall import Wall
 from graph import Pacman_Graph
-
+from graph import Node
 # from pygame.locals import *
 if not pygame.font:
     print('Warning, fonts disabled')
@@ -74,12 +74,14 @@ class PacmanMain:
                     # print(dot.rect.y)
                     self.all_sprite_list.add(dot)
                     self.all_dots_list.add(dot)
-                    self.graph.create_node(dot, False, False)
+                    dot_node = Node(dot)
+                    self.graph.create_node(dot_node, False, False)
                 elif(c == "P"):
                     self.pacman = PacmanAgent(lineX+10, lineY*40)
                     self.pacman.walls = self.wall_list
                     self.all_sprite_list.add(self.pacman)
-                    self.graph.create_node(self.pacman, True, False)
+                    pacman_node = Node(self.pacman)
+                    self.graph.create_node(pacman_node, True, False)
                 elif(c == "G"):
                     print(counterGhosts)
                     if(counterGhosts == 0):
@@ -87,7 +89,8 @@ class PacmanMain:
                         ghost.walls = self.wall_list
                         self.ghosts_list.add(ghost)
                         self.all_sprite_list.add(ghost)
-                        self.graph.create_node(ghost, False, True)
+                        ghost_node = Node(ghost)
+                        self.graph.create_node(ghost_node, False, True)
                     counterGhosts += 1
                 elif(c == "o"):
                     pass
