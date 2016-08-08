@@ -14,7 +14,7 @@ class GhostAgent(pygame.sprite.Sprite):
         super().__init__()
 
         self.image = pygame.image.load("Images/ghosts/"+name+".png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (30,30))
+        self.image = pygame.transform.scale(self.image, (10,10))
         # Make our top-left corner the passed-in location.
         self.rect = self.image.get_rect()
         self.rect.y = y

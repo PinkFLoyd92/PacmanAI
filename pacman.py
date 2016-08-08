@@ -62,7 +62,6 @@ class PacmanMain:
         for line in f:
             lineX = 0  # actual position in X of the sprite
             line = line.strip()
-            # print(line)
             for c in line:
                 if(c == "@"):
                     wall = Wall(lineX, lineY*40, 35, 35)
@@ -70,22 +69,20 @@ class PacmanMain:
                     self.all_sprite_list.add(wall)
                 elif(c == "."):
                     dot = Dot(lineX+10, lineY*40+15, 10, 10)
-                    # print(dot.rect.x)
                     # print(dot.rect.y)
                     self.all_sprite_list.add(dot)
                     self.all_dots_list.add(dot)
                     dot_node = Node(dot)
                     self.graph.create_node(dot_node, False, False)
                 elif(c == "P"):
-                    self.pacman = PacmanAgent(lineX+10, lineY*40)
+                    self.pacman = PacmanAgent(lineX+10, lineY*40 + 15)
                     self.pacman.walls = self.wall_list
                     self.all_sprite_list.add(self.pacman)
                     pacman_node = Node(self.pacman)
                     self.graph.create_node(pacman_node, True, False)
                 elif(c == "G"):
-                    print(counterGhosts)
                     if(counterGhosts == 0):
-                        ghost = GhostAgent(lineX+10, lineY*40, "blinky")
+                        ghost = GhostAgent(lineX+10, lineY*40 + 15, "blinky")
                         ghost.walls = self.wall_list
                         self.ghosts_list.add(ghost)
                         self.all_sprite_list.add(ghost)
@@ -106,9 +103,10 @@ class PacmanMain:
                 if event.type == pygame.QUIT:
                     sys.exit()
                 elif event.type == pygame.KEYDOWN:
-                    self.pacman.image = pygame.transform.scale(self. pacman.image, (20, 20))
+                    self.pacman.image = pygame.transform.scale(self. pacman.image, (10, 10))
                     if event.key == pygame.K_LEFT:
                         self.pacman.image = pygame.image.load("Images/pacman_left.png").convert_alpha()
+                        self.pacman.image = pygame.transform.scale(self.pacman.image, (10, 10))
                         self.pacman.changespeed(-3, 0)
                     elif event.key == pygame.K_RIGHT:
                         self.pacman.image = pygame.image.load("Images/pacman_right.png").convert_alpha()

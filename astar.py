@@ -18,17 +18,11 @@ class Node:
 class State_Graph:
     def __init__(self):
         """ Class that contains the AI part of the program"""
-        self.state_nodes = []
-        
+        self.state_nodes = [] 
 
     def fillGraph(self, pacman_graph):
         pass
 
-
-
-
-
-        
 def children(point, grid):
     x, y = point. point
     links = [grid[d[0]][d[1]] for d in [(x-1, y), (x, y - 1), (x, y + 1), (x+1, y)]]

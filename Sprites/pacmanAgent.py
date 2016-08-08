@@ -17,7 +17,7 @@ class PacmanAgent(pygame.sprite.Sprite):
         # self.image = pygame.Surface([15, 15])
         # self.image.fill(WHITE)
         self.image = pygame.image.load("Images/pacman_right.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (30, 30))
+        self.image = pygame.transform.scale(self.image, (10, 10))
         # Make our top-left corner the passed-in location.
         self.rect = self.image.get_rect()
         self.rect.y = y

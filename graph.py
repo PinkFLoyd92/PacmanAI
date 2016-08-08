@@ -24,7 +24,7 @@ class Pacman_Graph(object):
     """
     def __init__(self):
         super(Pacman_Graph, self).__init__()
-        self.graph = nx.Graph()
+        self.graph = nx.DiGraph()
         self.node_pacman = None
         self.node_ghost = None
         self.lastCreatedNode = None
@@ -32,26 +32,36 @@ class Pacman_Graph(object):
 
     def checkTopCollisions(self, new_node):
         for node in self.nodes_list:
-            if(node.graph_node.rect.y is not new_node.graph_node.rect.y):
-                if(node.graph_node.rect.x is new_node.graph_node.rect.x and (new_node.graph_node.rect.y - node.graph_node.rect.y == 40)):
-                    self.graph.add_edge(new_node, node, {"direction": TOP})
-                    self.graph.add_edge(node, new_node, {"direction": DOWN})
+            if(node.graph_node.rect.y != new_node.graph_node.rect.y):
+                if (new_node.graph_node.rect.x == 730 and new_node.graph_node.rect.y == 455):
+                    if(node.graph_node.rect.x == 730 and node.graph_node.rect.y == 415):
+                        if (node.graph_node.rect.x == new_node.graph_node.rect.x and new_node.graph_node.rect.y - node.graph_node.rect.y == 40):
+                            print("sadas")
+                if(node.graph_node.rect.x == new_node.graph_node.rect.x and new_node.graph_node.rect.y - node.graph_node.rect.y == 40):
+                    self.graph.add_edge(new_node, node, {"direction": TOP, "weight": 1})
+                    self.graph.add_edge(node, new_node, {"direction": DOWN, "weight": 1})
+                    # print(new_node)
 
     def create_node(self, new_node, pacman=False, ghost=False):
         """ Each one of the nodes is a Sprite (dot and the agents). """
         self.graph.add_node(new_node)
         if(self.lastCreatedNode is not None):
             if(self.lastCreatedNode.graph_node.rect.y == new_node.graph_node.rect.y and (new_node.graph_node.rect.x - self.lastCreatedNode.graph_node.rect.x == 40)):
-                self.graph.add_edge(self.lastCreatedNode, new_node, {"direction": LEFT})
-                self.graph.add_edge(new_node, self.lastCreatedNode, {"direction": RIGHT})
-
+                self.graph.add_edge(self.lastCreatedNode, new_node, {"direction": LEFT, "weight": 1})
+                self.graph.add_edge(new_node, self.lastCreatedNode, {"direction": RIGHT, "weight": 1})
         self.checkTopCollisions(new_node)
+        # print(self.graph.neighbors(new_node))
         self.nodes_list.append(new_node)
         self.lastCreatedNode = new_node
+        if(self.lastCreatedNode.graph_node.rect.x == 730 and self.lastCreatedNode.graph_node.rect.y == 455):
+            pass
         if pacman is not False:
             self.node_pacman = new_node
         elif ghost is not False:
             self.node_ghost = new_node
+
+    def getChildren(self, node):
+        pass
 
     def print_graph(self):
         print(self.graph.number_of_nodes())
@@ -64,3 +74,5 @@ class Pacman_Graph(object):
 
         print(self.node_ghost)
         print(self.node_pacman)
+        # print(nx.dijkstra_path(self.graph, self.node_pacman, self.lastCreatedNode))
+        
