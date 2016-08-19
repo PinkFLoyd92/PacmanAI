@@ -7,9 +7,11 @@ WHITE = (255, 255, 255)
 BLUE = (50, 50, 255)
 
 #http://www.programarcadegames.com/python_examples/f.php?file=move_with_walls_example.py 
+
+
 class GhostAgent(pygame.sprite.Sprite):
         # Constructor function
-    def __init__(self, x, y,name):
+    def __init__(self, x, y, name):
         # Call the parent's constructor
         super().__init__()
 

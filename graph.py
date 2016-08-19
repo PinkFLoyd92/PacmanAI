@@ -1,6 +1,7 @@
 """ All the state of the game will be saved here"""
 import networkx as nx
-
+import pygame
+from Sprites.food import Dot
 RIGHT = 1
 LEFT = 2
 DOWN = 3
@@ -36,11 +37,10 @@ class Pacman_Graph(object):
                 if (new_node.graph_node.rect.x == 730 and new_node.graph_node.rect.y == 455):
                     if(node.graph_node.rect.x == 730 and node.graph_node.rect.y == 415):
                         if (node.graph_node.rect.x == new_node.graph_node.rect.x and new_node.graph_node.rect.y - node.graph_node.rect.y == 40):
-                            print("sadas")
+                            pass
                 if(node.graph_node.rect.x == new_node.graph_node.rect.x and new_node.graph_node.rect.y - node.graph_node.rect.y == 40):
                     self.graph.add_edge(new_node, node, {"direction": TOP, "weight": 1})
                     self.graph.add_edge(node, new_node, {"direction": DOWN, "weight": 1})
-                    # print(new_node)
 
     def create_node(self, new_node, pacman=False, ghost=False):
         """ Each one of the nodes is a Sprite (dot and the agents). """
@@ -49,8 +49,8 @@ class Pacman_Graph(object):
             if(self.lastCreatedNode.graph_node.rect.y == new_node.graph_node.rect.y and (new_node.graph_node.rect.x - self.lastCreatedNode.graph_node.rect.x == 40)):
                 self.graph.add_edge(self.lastCreatedNode, new_node, {"direction": LEFT, "weight": 1})
                 self.graph.add_edge(new_node, self.lastCreatedNode, {"direction": RIGHT, "weight": 1})
-        self.checkTopCollisions(new_node)
-        # print(self.graph.neighbors(new_node))
+                self.checkTopCollisions(new_node)
+                # print(self.graph.neighbors(new_node))
         self.nodes_list.append(new_node)
         self.lastCreatedNode = new_node
         if(self.lastCreatedNode.graph_node.rect.x == 730 and self.lastCreatedNode.graph_node.rect.y == 455):
@@ -66,7 +66,6 @@ class Pacman_Graph(object):
     def print_graph(self):
         print(self.graph.number_of_nodes())
         print(self.graph.number_of_edges())
-        # print(self.graph.edges())
         for n, nbrs in self.graph.adjacency_iter():
             for nbr, eattr in nbrs.items():
                 data = eattr['direction']
@@ -75,4 +74,24 @@ class Pacman_Graph(object):
         print(self.node_ghost)
         print(self.node_pacman)
         # print(nx.dijkstra_path(self.graph, self.node_pacman, self.lastCreatedNode))
-        
+
+    def getClosestPills(self, node):
+        """returns an array with the next nodes that have a pill in them"""
+        array_nodes = []
+        neighbors = self.graph.neighbors(node)
+        for neighbor in neighbors:
+            if(isinstance(neighbor.graph_node, Dot)):
+                if(neighbor.graph_node.has_image):
+                    array_nodes.append(neighbor)
+                elif(not neighbor.graph_node.has_image):
+                    array_nodes.append(self.generateNeighborPill(neighbor, node))  # generate each neighbor pill
+        return array_nodes
+
+    def generateNeighborPill(self, node, prev_node):
+        neighbors = self.graph.neighbors(node)
+        for neighbor in neighbors:
+            if(isinstance(neighbor.graph_node, Dot)):
+                if(neighbor is not prev_node and isinstance(neighbor.graph_node, Dot) and neighbor.graph_node.has_image):
+                    return neighbor
+                elif(neighbor is not prev_node and not neighbor.graph_node.has_image):
+                    return self.generateNeighborPill(neighbor, node)

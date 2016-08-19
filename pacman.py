@@ -93,7 +93,8 @@ class PacmanMain:
                     pass
                 lineX += 40
             lineY += 1
-        self.graph.print_graph()
+        array = self.graph.getClosestPills(self.graph.node_pacman)
+        print(len(array))
 
     def mainLoop(self):
         "Main loop of the game"
@@ -110,12 +111,15 @@ class PacmanMain:
                         self.pacman.changespeed(-3, 0)
                     elif event.key == pygame.K_RIGHT:
                         self.pacman.image = pygame.image.load("Images/pacman_right.png").convert_alpha()
+                        self.pacman.image = pygame.transform.scale(self.pacman.image, (10, 10))
                         self.pacman.changespeed(3, 0)
                     elif event.key == pygame.K_UP:
                         self.pacman.image = pygame.image.load("Images/pacman_top.png").convert_alpha()
+                        self.pacman.image = pygame.transform.scale(self.pacman.image, (10, 10))
                         self.pacman.changespeed(0, -3)
                     elif event.key == pygame.K_DOWN:
                         self.pacman.image = pygame.image.load("Images/pacman_down.png").convert_alpha()
+                        self.pacman.image = pygame.transform.scale(self.pacman.image, (10, 10))
                         self.pacman.changespeed(0, 3)
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT:

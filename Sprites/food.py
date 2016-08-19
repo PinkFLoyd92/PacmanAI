@@ -36,7 +36,5 @@ class Dot(pygame.sprite.Sprite):
     def update_image_state(self):
         """ return boolean telling if the dot has or does not have image. """
         self.has_image = False
+        self.image = pygame.image.load("Images/Empty.png").convert_alpha()
         self.image = pygame.Surface([self.width, self.height])
-        self.image.fill(BLACK)
-        key = (0,255,0)
-        self.image.set_colorkey(key)

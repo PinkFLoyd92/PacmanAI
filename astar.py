@@ -31,7 +31,7 @@ def children(point, grid):
 def manhattan(point, point2):
     return abs(point.point[0] - point2.point[0]) + abs(point.point[1]-point2.point[0])
 
-def aStar(start, goal, grid):
+def aStar(start, goal, graph):
     # The open and closed sets
     openset = set()
     closedset = set()
@@ -56,7 +56,7 @@ def aStar(start, goal, grid):
         # Add it to the closed set
         closedset.add(current)
         # Loop through the node's children/siblings
-        for node in children(current, grid):
+        for node in children(current, graph):
             # If it is already in the closed set, skip it
             if node in closedset:
                 continue
