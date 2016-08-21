@@ -1,7 +1,7 @@
 import sys
 
 import pygame
-
+import time
 from Sprites.food import Dot
 from Sprites.ghost import GhostAgent
 from Sprites.pacmanAgent import PacmanAgent
@@ -93,44 +93,52 @@ class PacmanMain:
                     pass
                 lineX += 40
             lineY += 1
-        array = self.graph.getClosestPills(self.graph.node_pacman)
-        print(len(array))
+        # self.graph.updatePacmanPosition()
 
     def mainLoop(self):
         "Main loop of the game"
+        i = 0
+        goal = None
+        new_ghost_path = self.graph.getGhostPath()
+        if (goal == None):
+            goal = self.graph.generateNextPill()
+        array_aStar = self.graph.aStar(self.graph.node_pacman, goal, self.graph)
+        self.graph.printDjistra(array_aStar)
         while 1:
+            #try to eat dot in position
             self.pacman.tryToEatDot()
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    sys.exit()
-                elif event.type == pygame.KEYDOWN:
-                    self.pacman.image = pygame.transform.scale(self. pacman.image, (10, 10))
-                    if event.key == pygame.K_LEFT:
-                        self.pacman.image = pygame.image.load("Images/pacman_left.png").convert_alpha()
-                        self.pacman.image = pygame.transform.scale(self.pacman.image, (10, 10))
-                        self.pacman.changespeed(-3, 0)
-                    elif event.key == pygame.K_RIGHT:
-                        self.pacman.image = pygame.image.load("Images/pacman_right.png").convert_alpha()
-                        self.pacman.image = pygame.transform.scale(self.pacman.image, (10, 10))
-                        self.pacman.changespeed(3, 0)
-                    elif event.key == pygame.K_UP:
-                        self.pacman.image = pygame.image.load("Images/pacman_top.png").convert_alpha()
-                        self.pacman.image = pygame.transform.scale(self.pacman.image, (10, 10))
-                        self.pacman.changespeed(0, -3)
-                    elif event.key == pygame.K_DOWN:
-                        self.pacman.image = pygame.image.load("Images/pacman_down.png").convert_alpha()
-                        self.pacman.image = pygame.transform.scale(self.pacman.image, (10, 10))
-                        self.pacman.changespeed(0, 3)
-                elif event.type == pygame.KEYUP:
-                    if event.key == pygame.K_LEFT:
-                        self.pacman.changespeed(3, 0)
-                    elif event.key == pygame.K_RIGHT:
-                        self.pacman.changespeed(-3, 0)
-                    elif event.key == pygame.K_UP:
-                        self.pacman.changespeed(0, 3)
-                    elif event.key == pygame.K_DOWN:
-                        self.pacman.changespeed(0, -3)
-            self.all_sprite_list.update()
+            print("el nodo esta en " + str(self.graph.node_pacman.graph_node.rect.x) + ", " + str(self.graph.node_pacman.graph_node.rect.y))
+            if(goal == None):
+                goal = self.graph.generateNextPill()
+
+            #list of movements that are followed in order to go to that pill.
+            # array_aStar = self.graph.aStar(self.graph.node_pacman, goal, self.graph)
+            if(len(array_aStar) == 1):
+                goal = self.graph.generateNextPill()
+                array_aStar = self.graph.aStar(self.graph.node_pacman, goal, self.graph)
+
+            # we move PacmanAgent to our new node.
+            new_dot2 = self.graph.updateAgentPosition(self.graph.node_pacman, array_aStar[1])[0]
+            del (array_aStar[0])
+            self.all_dots_list.add(new_dot2)
+            self.all_sprite_list.add(new_dot2)
+            self.screen.fill(BLACK)
+            self.all_sprite_list.draw(self.screen)
+            pygame.display.flip()
+            self.clock.tick(60)
+
+            #update ghost movement.............
+            new_dot = self.graph.updateAgentPosition(self.graph.node_ghost,new_ghost_path[1])[0]
+            self.all_dots_list.add(new_dot)
+            self.all_sprite_list.add(new_dot)
+            self.screen.fill(BLACK)
+            self.all_sprite_list.draw(self.screen)
+            pygame.display.flip()
+            self.clock.tick(60)
+            del(new_ghost_path[0])
+            new_ghost_path = self.graph.getGhostPath()
+            time.sleep(1)
+
             self.screen.fill(BLACK)
             self.all_sprite_list.draw(self.screen)
             pygame.display.flip()

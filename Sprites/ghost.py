@@ -32,7 +32,7 @@ class GhostAgent(pygame.sprite.Sprite):
         self.change_x += x
         self.change_y += y
         
-    def update(self):
+    def update(self, x = None, y  = None):
         """ Update the ghost position. """
         # Move left/right
         self.rect.x += self.change_x

@@ -38,3 +38,9 @@ class Dot(pygame.sprite.Sprite):
         self.has_image = False
         self.image = pygame.image.load("Images/Empty.png").convert_alpha()
         self.image = pygame.Surface([self.width, self.height])
+
+    def repaint(self):
+        self.image = pygame.image.load("Images/dot.png").convert_alpha()
+        # self.image.fill(BLUE)
+        self.image = pygame.transform.scale(self.image, (width, height))
+        self.has_image = True

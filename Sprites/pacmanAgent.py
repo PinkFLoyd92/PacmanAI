@@ -39,13 +39,10 @@ class PacmanAgent(pygame.sprite.Sprite):
         """Eat a dot, update the dots counter"""
         block_hit_list = pygame.sprite.spritecollide(self, self.dots_to_eat, False)
         for dot in block_hit_list:
-            # self.dots_to_eat.remove(dot)
-            # dot.get_image_state()
-            # dot.kill()
             if dot.get_image_state() is True:
                 dot.update_image_state()
 
-    def update(self):
+    def update(self, x = None, y = None):
         """ Update the player position. """
         # Move left/right
         self.rect.x += self.change_x
