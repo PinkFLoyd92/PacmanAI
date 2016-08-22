@@ -5,6 +5,7 @@ from Sprites.food import Dot
 from Sprites.ghost import GhostAgent
 from Sprites.pacmanAgent import PacmanAgent
 import time
+from queue import PriorityQueue
 import random
 
 RIGHT = 1
@@ -36,6 +37,9 @@ class Pacman_Graph():
         self.node_ghost = None
         self.lastCreatedNode = None
         self.nodes_list = []
+
+    def computeCost(self, node, goal):
+        return self.manhattan(node,self.node_ghost) + self.manhattan(node,goal)
 
     def checkTopCollisions(self, new_node):
         for node in self.nodes_list:
@@ -109,22 +113,30 @@ class Pacman_Graph():
     def generateNextPill(self):
         list_nodes = []
         array_nodes = []
-        if(self.manhattan(self.node_pacman, self.node_ghost) <100):
-            array_nodes = filter(lambda node: isinstance(node.graph_node, Dot), self.graph.nodes())
-            array_nodes = filter(lambda node: node.graph_node.has_image == True, list(array_nodes))
-            array_nodes = filter(lambda node: node.graph_node.rect.x>= self.node_ghost.rect.x, list(array_nodes))
-            array_nodes = filter(lambda node: node.graph_node.rect.y >= self.node_ghost.rect.y, list(array_nodes))
-            list_nodes = list(array_nodes)
-            random.shuffle(list_nodes)
-            return(list_nodes[0])
+        manhattan = {'node':[], 'distance': 0}
+        possible_options = self.graph.neighbors(self.node_pacman)
+        for node in possible_options:
+            path_total = nx.dijkstra_path(self.graph, self.node_ghost, self.node_pacman)
+            len_path = len(path_total)
+            if(self.manhattan(node,self.node_ghost) > manhattan['distance'] -10 and len_path>3):
+                manhattan['node'].append(node)
+                manhattan['distance'] = self.manhattan(node,self.node_ghost)
+        random.shuffle(manhattan['node'])
+        for node in manhattan['node'] :
+            if(node.graph_node.has_image ==True):
+                return node
+        if(len(manhattan['node']) == 0):
+            possible_options = self.graph.neighbors(self.node_pacman)
+            for node in possible_options:
+                best = {'node':None, 'distance':0}
+                if(self.manhattan(node, self.node_ghost)> best['distance']):
+                    best['node'] = node
+                    best['distance'] = self.manhattan(node, self.node_ghost)
+            return best['node']
+                    
 
-        array_nodes = filter(lambda node: isinstance(node.graph_node, Dot), self.graph.nodes())
-        array_nodes = filter(lambda node: node.graph_node.has_image == True, list(array_nodes))
-        # array_nodes = filter(lambda node: node.graph_node.rect.x == self.node_pacman.graph_node.rect.x, list(array_nodes))
-        list_nodes = list(array_nodes)
-        random.shuffle(list_nodes)
-        print("El siguiente objetivo esta en: "+ str(list_nodes[0].graph_node.rect.x) + " y la posicion en Y es: "+str(list_nodes[0].graph_node.rect.y))
-        return list_nodes[0]
+
+        return manhattan['node'][0]
 
     # here we update the node where an agent is moved and return the node
     def updateAgentPosition(self, agent, next_node = None):
@@ -177,16 +189,23 @@ class Pacman_Graph():
         return [dot,next_node]
 
     def getGhostPath(self):
-
-        return (nx.dijkstra_path(self.graph, self.node_ghost, self.node_pacman))
+        try:
+            path = nx.dijkstra_path(self.graph, self.node_ghost, self.node_pacman)
+            return (nx.dijkstra_path(self.graph, self.node_ghost, self.node_pacman))
+        except nx.NetworkXError:
+            print("error")
+            return self.graph.neighbors(self.node_ghost)
 
     def printDjistra(self,path):
-        i = 0
-        for node in path:
-            i = i + 1
-            sprite = node.graph_node
-            print("el nodo " + str(i) + "tiene" + "en X " + str(sprite.rect.x) + "en Y " + str(sprite.rect.y))
-            # time.sleep(1)
+        try:
+            i = 0
+            for node in path:
+                i = i + 1
+                sprite = node.graph_node
+                print("el nodo " + str(i) + "tiene" + "en X " + str(sprite.rect.x) + "en Y " + str(sprite.rect.y))
+                # time.sleep(1)
+        except nx.NetworkXError:
+            print("error")
 
     # startNode, goalNode, graph.
     def aStar(self, start, goal, graph):
@@ -212,7 +231,7 @@ class Pacman_Graph():
                     path.append(current)
                     current = current.parent
                     path.append(current)
-                return (nx.dijkstra_path(self.graph, self.node_pacman, goal))
+                return path[::-1]
 
             # Remove the item from the open set
             openset.remove(current)
@@ -250,3 +269,31 @@ class Pacman_Graph():
 
     def printPacmanPosition(self):
         pass
+
+
+    def heuristic(self,a, b):
+        return self.manhattan(a,b)
+
+    def a_star_search(self, graph, start, goal):
+        frontier = PriorityQueue()
+        frontier.put(start, 0.00)
+        came_from = {}
+        cost_so_far = {}
+        came_from[start] = None
+        cost_so_far[start] = 0
+
+        while not frontier.empty():
+            current = frontier.get()
+
+            if current == goal:
+                break
+
+            for next in graph.neighbors(current):
+                new_cost = cost_so_far[current] + self.manhattan(current, next)
+                if next not in cost_so_far or new_cost > cost_so_far[next]: # the more the cost is the best.
+                    cost_so_far[next] = new_cost
+                    priority = new_cost + self.heuristic(goal, next)
+                    frontier.put(next, priority)
+                    came_from[next] = current
+
+        return came_from, cost_so_far

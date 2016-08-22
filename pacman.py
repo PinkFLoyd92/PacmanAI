@@ -1,6 +1,7 @@
 import sys
 
 import pygame
+import networkx as nx
 import time
 from Sprites.food import Dot
 from Sprites.ghost import GhostAgent
@@ -102,47 +103,57 @@ class PacmanMain:
         new_ghost_path = self.graph.getGhostPath()
         if (goal == None):
             goal = self.graph.generateNextPill()
-        array_aStar = self.graph.aStar(self.graph.node_pacman, goal, self.graph)
-        self.graph.printDjistra(array_aStar)
+        #array_aStar = self.graph.aStar(self.graph.node_pacman, goal, self.graph)
+        #self.graph.printDjistra(array_aStar)
         while 1:
-            #try to eat dot in position
-            self.pacman.tryToEatDot()
-            print("el nodo esta en " + str(self.graph.node_pacman.graph_node.rect.x) + ", " + str(self.graph.node_pacman.graph_node.rect.y))
-            if(goal == None):
+            try:
+                #try to eat dot in position
+                self.pacman.tryToEatDot()
+                # print("el nodo esta en " + str(self.graph.node_pacman.graph_node.rect.x) + ", " + str(self.graph.node_pacman.graph_node.rect.y))
                 goal = self.graph.generateNextPill()
+                #came_from = self.graph.a_star_search(self.graph.graph,self.graph.node_pacman,goal)
+                #print("a estrella")
+                #print (came_from)
 
-            #list of movements that are followed in order to go to that pill.
-            # array_aStar = self.graph.aStar(self.graph.node_pacman, goal, self.graph)
-            if(len(array_aStar) == 1):
+                #list of movements that are followed in order to go to that pill.
+                # array_aStar = self.graph.aStar(self.graph.node_pacman, goal, self.graph)
+                # if(len(array_aStar) == 1):
+                #     goal = self.graph.generateNextPill()
+                #     array_aStar = self.graph.aStar(self.graph.node_pacman, goal, self.graph)
+
+                new_dot2 = self.graph.updateAgentPosition(self.graph.node_pacman, goal)[0]
+
                 goal = self.graph.generateNextPill()
-                array_aStar = self.graph.aStar(self.graph.node_pacman, goal, self.graph)
+                # we move PacmanAgent to our new node.
+                #new_dot2 = self.graph.updateAgentPosition(self.graph.node_pacman, array_aStar[1])[0]
+                #del (array_aStar[0])
+                self.all_dots_list.add(new_dot2)
+                self.all_sprite_list.add(new_dot2)
+                self.screen.fill(BLACK)
+                self.all_sprite_list.draw(self.screen)
+                pygame.display.flip()
+                self.clock.tick(60)
 
-            # we move PacmanAgent to our new node.
-            new_dot2 = self.graph.updateAgentPosition(self.graph.node_pacman, array_aStar[1])[0]
-            del (array_aStar[0])
-            self.all_dots_list.add(new_dot2)
-            self.all_sprite_list.add(new_dot2)
-            self.screen.fill(BLACK)
-            self.all_sprite_list.draw(self.screen)
-            pygame.display.flip()
-            self.clock.tick(60)
+                #update ghost movement.............
+                new_dot = self.graph.updateAgentPosition(self.graph.node_ghost,new_ghost_path[1])[0]
+                self.all_dots_list.add(new_dot)
+                self.all_sprite_list.add(new_dot)
+                self.screen.fill(BLACK)
+                self.all_sprite_list.draw(self.screen)
+                pygame.display.flip()
+                self.clock.tick(60)
+                del(new_ghost_path[0])
+                new_ghost_path = self.graph.getGhostPath()
+                if(len(new_ghost_path) == 2):
+                    new_ghost_path = self.graph.graph.neighbors(self.graph.node_ghost)
+                time.sleep(1)
 
-            #update ghost movement.............
-            new_dot = self.graph.updateAgentPosition(self.graph.node_ghost,new_ghost_path[1])[0]
-            self.all_dots_list.add(new_dot)
-            self.all_sprite_list.add(new_dot)
-            self.screen.fill(BLACK)
-            self.all_sprite_list.draw(self.screen)
-            pygame.display.flip()
-            self.clock.tick(60)
-            del(new_ghost_path[0])
-            new_ghost_path = self.graph.getGhostPath()
-            time.sleep(1)
-
-            self.screen.fill(BLACK)
-            self.all_sprite_list.draw(self.screen)
-            pygame.display.flip()
-            self.clock.tick(60)
+                self.screen.fill(BLACK)
+                self.all_sprite_list.draw(self.screen)
+                pygame.display.flip()
+                self.clock.tick(60)
+            except nx.NetworkXError:
+                print("error")
 
 
 def main():
