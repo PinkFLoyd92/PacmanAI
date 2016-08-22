@@ -111,6 +111,7 @@ class Pacman_Graph():
                     return self.generateNeighborPill(neighbor, node)
 
     def generateNextPill(self):
+        list_nodes_temp = self.aStar(self.node_pacman, self.node_ghost,self.graph)
         list_nodes = []
         array_nodes = []
         manhattan = {'node':[], 'distance': 0}
@@ -118,7 +119,7 @@ class Pacman_Graph():
         for node in possible_options:
             path_total = nx.dijkstra_path(self.graph, self.node_ghost, self.node_pacman)
             len_path = len(path_total)
-            if(self.manhattan(node,self.node_ghost) > manhattan['distance'] -10 and len_path>3):
+            if(self.manhattan(node,self.node_ghost) > manhattan['distance'] -10 and len_path>4):
                 manhattan['node'].append(node)
                 manhattan['distance'] = self.manhattan(node,self.node_ghost)
         random.shuffle(manhattan['node'])
@@ -127,13 +128,13 @@ class Pacman_Graph():
                 return node
         if(len(manhattan['node']) == 0):
             possible_options = self.graph.neighbors(self.node_pacman)
+            best = {'node': None, 'distance': 0}
             for node in possible_options:
-                best = {'node':None, 'distance':0}
                 if(self.manhattan(node, self.node_ghost)> best['distance']):
                     best['node'] = node
                     best['distance'] = self.manhattan(node, self.node_ghost)
             return best['node']
-                    
+
 
 
         return manhattan['node'][0]
@@ -219,19 +220,17 @@ class Pacman_Graph():
 
         # Add the starting point to the open set
         openset.add(current)
-
         # While the open set is not empty
         while openset:
             # Find the item in the open set with the lowest G + H score
             current = min(openset, key=lambda o: o.G + o.H)
             # If it is the item we want, retrace the path and return it
             if current == goal:
-                path = []
-                while current.parent:
+                while current.parent and isinstance(current.parent, Dot):
                     path.append(current)
                     current = current.parent
                     path.append(current)
-                return path[::-1]
+                return path
 
             # Remove the item from the open set
             openset.remove(current)
@@ -239,33 +238,51 @@ class Pacman_Graph():
             closedset.add(current)
             # Loop through the node's children/siblings
             for node in self.graph.neighbors(current):
-                # If it is already in the closed set, skip it
-                if node in closedset:
-                    continue
-                # Otherwise if it is already in the open set
-                if node in openset:
-                    # Check if we beat the G score
-                    new_g = current.G + self.manhattan(current, node)
-                    if node.G < new_g:
-                        # If so, update the node to have a new parent
-                        node.G = new_g
+                if node is not None and isinstance(node.graph_node,Dot):
+                    # If it is already in the closed set, skip it
+                    if node in closedset:
+                        continue
+                    # Otherwise if it is already in the open set
+                    if node in openset:
+                        # Check if we beat the G score
+                        new_g = current.G + self.manhattan(current, node)
+                        if node.G < new_g:
+                            # If so, update the node to have a new parent
+                            node.G = new_g
+                            node.parent = current
+                    else:
+                        # If it isn't in the open set, calculate the G and H score for the node
+                        node.G = current.G + self.manhattan(node, self.node_ghost)
+                        print("node")
+                        print(node.graph_node)
+                        print(goal.graph_node)
+                        node.H = self.manhattan(node, goal)
+                        # Set the parent to our current item
                         node.parent = current
-                else:
-                    # If it isn't in the open set, calculate the G and H score for the node
-                    node.G = current.G + self.manhattan(node,goal)
-                    node.H = self.manhattan(node, self.node_ghost)
-                    # Set the parent to our current item
-                    node.parent = current
-                    # Add it to the set
-                    openset.add(node)
 
-        for node in self.graph.nodes():
-            node.parent = None
+                        # Add it to the set
+                        openset.add(node)
+
 
     # getting the distance
     def manhattan(self, node1, node2):
         return abs(node2.graph_node.rect.x - node1.graph_node.rect.x) + abs(node2.graph_node.rect.y - node1.graph_node.rect.y)
 
+    # obtenemos el g,h de los nodos.
+    def heuristic_goal(self,first,next, goal):
+        h = 0
+        g = 0
+        path = nx.dijkstra_path(self.graph, next, goal)
+        length = len(path)
+        if(length > 5):
+            h = 1
+        elif(length<=5):
+            h = (length)/5
+        if(self.manhattan(first, self.node_ghost)>200):
+            g = 0
+        elif(self.manhattan(first, self.node_ghost)<=200):
+            g = 1 - self.manhattan(first, self.node_ghost)/200
+        return [g,h]
 
     def printPacmanPosition(self):
         pass

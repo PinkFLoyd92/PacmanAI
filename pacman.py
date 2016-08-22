@@ -1,5 +1,4 @@
 import sys
-
 import pygame
 import networkx as nx
 import time
@@ -9,6 +8,8 @@ from Sprites.pacmanAgent import PacmanAgent
 from Sprites.wall import Wall
 from graph import Pacman_Graph
 from graph import Node
+import atexit
+
 # from pygame.locals import *
 if not pygame.font:
     print('Warning, fonts disabled')
@@ -46,7 +47,7 @@ class PacmanMain:
         # Make the walls. (x_pos, y_pos, width, height)
         self.wall_list = pygame.sprite.Group()
         self.graph = Pacman_Graph()
-        self.loadLayout("./Game-Layout/layout")
+        self.loadLayout("./Game-Layout/"+sys.argv[1])
         self.pacman.dots_to_eat = self.all_dots_list
         # Create the player paddle object
         # self.pacman = PacmanAgent(20, 20)
@@ -96,7 +97,7 @@ class PacmanMain:
             lineY += 1
         # self.graph.updatePacmanPosition()
 
-    def mainLoop(self):
+    def mainLoop(self,nodes):
         "Main loop of the game"
         i = 0
         goal = None
@@ -105,22 +106,41 @@ class PacmanMain:
             goal = self.graph.generateNextPill()
         #array_aStar = self.graph.aStar(self.graph.node_pacman, goal, self.graph)
         #self.graph.printDjistra(array_aStar)
+        iteracion = 0
         while 1:
             try:
                 #try to eat dot in position
                 self.pacman.tryToEatDot()
                 # print("el nodo esta en " + str(self.graph.node_pacman.graph_node.rect.x) + ", " + str(self.graph.node_pacman.graph_node.rect.y))
                 goal = self.graph.generateNextPill()
+                nodes.append(goal)
+
+                print("closest nodes to pacman")
+                iteracion = iteracion + 1
+                print(iteracion)
+
+                nodes_close = self.graph.getClosestPills(self.graph.node_pacman)
+                if (len(nodes_close) == 0):
+                    print("closest nodes are empty")
+                for node in nodes_close:
+                    if(node is None):
+                        del(node)
+                    else:
+                        print(node.graph_node)
+                print("closest nodes to pacman")
                 #came_from = self.graph.a_star_search(self.graph.graph,self.graph.node_pacman,goal)
                 #print("a estrella")
                 #print (came_from)
 
                 #list of movements that are followed in order to go to that pill.
-                # array_aStar = self.graph.aStar(self.graph.node_pacman, goal, self.graph)
+                array_aStar = self.graph.aStar(self.graph.node_pacman, goal, self.graph)
+                for node in self.graph.graph.nodes():
+                    node.parent = None
                 # if(len(array_aStar) == 1):
                 #     goal = self.graph.generateNextPill()
                 #     array_aStar = self.graph.aStar(self.graph.node_pacman, goal, self.graph)
-
+                # print("a-star")
+                # self.graph.printDjistra(array_aStar)
                 new_dot2 = self.graph.updateAgentPosition(self.graph.node_pacman, goal)[0]
 
                 goal = self.graph.generateNextPill()
@@ -157,8 +177,16 @@ class PacmanMain:
 
 
 def main():
-    MainWindow = PacmanMain()
-    MainWindow.mainLoop()
-
+    try:
+        nodes = []
+        MainWindow = PacmanMain()
+        MainWindow.mainLoop(nodes)
+    except KeyboardInterrupt:
+        print("llllllllllllllllllllllllll")
+        print(nodes)
+        # clean up
+        raise
 if __name__ == '__main__':
     main()
+
+
